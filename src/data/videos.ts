@@ -2,6 +2,7 @@ export type VideoItem = {
   url: string;
   title: string;
   subtitle?: string; // вторая строка под названием (опционально)
+   isShort?: boolean; // ← добавили
 };
 
 export const longVideos: VideoItem[] = [
