@@ -47,7 +47,7 @@ export function AboutSection() {
           <div className="space-y-8">
             <div className="relative">
               <ImageWithFallback
-                src="/avatar.png"
+                src="/gemini-2.5-flash-image-preview_(nano-banana)_create_a_profile_pho (2) копия.png"
                 alt="Video Editor Portrait"
                 className="w-full max-w-md mx-auto rounded-2xl shadow-2xl"
               />
