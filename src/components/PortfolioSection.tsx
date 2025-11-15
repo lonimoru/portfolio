@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 import { VideoEmbed } from "./VideoEmbed";
 
 const featured = [
-  { url: "https://youtu.be/e1HMTzkBDR0", title: "ГРОМ.КО — Akatsuki Drums (промо)", subtitle: "Концертный промо-роли. 2025", ratio: "16:9" as const },
-  { url: "https://youtu.be/n8lYENa718c", title: "Дудл-видео (doodle video)", subtitle: "Объясняющее видео", ratio: "16:9" as const },
-  { url: "https://youtu.be/06jxSi6jtik", title: "Бьюти-ролик", subtitle: "Нарезка/коллаж", ratio: "16:9" as const },
+  { url: "https://youtu.be/e1HMTzkBDR0", title: "ГРОМ.КО — Akatsuki Drums (промо)", subtitle: "Концертный промо-роли", ratio: "16:9" as const },
+  { url: "https://youtu.be/n8lYENa718c", title: "Дудл-видео (doodle video)", subtitle: "Озвучивала нейросеть", ratio: "16:9" as const },
+  { url: "https://youtu.be/06jxSi6jtik", title: "Бьюти-ролик", subtitle: "", ratio: "16:9" as const },
   { url: "https://youtu.be/zGbYBkSNT54", title: "3D анимация логотипа — CISM", subtitle: "", ratio: "16:9" as const },
-  { url: "https://youtu.be/t8KCWUoMhck", title: "Подборка видео с нейросетями", subtitle: "демо возможностей", ratio: "16:9" as const },
-  { url: "https://youtu.be/5WPjoD-h-sI", title: "Ролик для курса Imagine B", subtitle: "анонс/промо", ratio: "16:9" as const },
+  { url: "https://youtu.be/ZX494YH2Jpw", title: "Приключения Бони и Джека", subtitle: "Мультфильм сделанный с помощью ИИ инструментов", ratio: "16:9" as const },
+  { url: "https://youtu.be/5WPjoD-h-sI", title: "Ролик для курса Imagine B", subtitle: "", ratio: "16:9" as const },
 ];
 
 function toId(u: string) {
@@ -37,10 +37,15 @@ export function PortfolioSection() {
                 {/* БЕЗ дополнительной внешней обёртки — VideoEmbed уже рисует аспект-контейнер */}
                 <VideoEmbed id={id} title={v.title} ratio={v.ratio} />
 
-                <p className="mt-3 text-sm font-medium text-gray-900">{v.title}</p>
-                {v.subtitle && (
-                  <div className="text-sm text-muted-foreground">{v.subtitle}</div>
-                )}
+                <p className="mt-3 text-sm font-medium text-gray-900">
+  {v.title}
+</p>
+{v.subtitle && (
+  <p className="mt-1 text-sm text-muted-foreground">
+    {v.subtitle}
+  </p>
+)}
+
               </div>
             );
           })}

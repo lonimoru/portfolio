@@ -35,16 +35,16 @@ const CONTACT_CARDS = [
     text: "Написать сообщение",
     href: "https://uslugi.yandex.ru/profile/NikitaR-303813",
   },
-  { icon: Phone, title: "Телефон", text: "По запросу", href: "tel:+7XXXXXXXXXX" },
-  { icon: MapPin, title: "География", text: "Москва, Санкт-Петербург, Волгоград" },
-  { icon: Clock, title: "Время связи", text: "с 10:00 до 22:00" },
+  { icon: Phone, title: "Телефон для связи", text: "+79377056859", },
+  { icon: MapPin, title: "География", text: "Волгоград. Удаленно по России" },
+  { icon: Clock, title: "Время связи", text: "с 11:00 до 22:00" },
 ];
 
 const SOCIAL_CARDS = [
-  { icon: Play, title: "Showreel 2021", text: "01:21", href: "https://youtu.be/..." },
+  { icon: Play, title: "Showreel 2021", text: "01:21", href: "https://youtu.be/n3rUELxETK0" },
   { icon: Images, title: "Портфолио", text: "Примеры работ", href: "/projects" },
-  { icon: GraduationCap, title: "Образование", text: "ВолгГТУ", href: "#" },
-  { icon: PercentCircle, title: "Скидка 10%", text: "Постоянным клиентам", href: "#" },
+  { icon: GraduationCap, title: "Образование", text: "ВолгГТУ" },
+  { icon: PercentCircle, title: "Скидка 10%", text: "Постоянным клиентам" },
 ];
 
 const PROJECT_TYPES = [
@@ -118,7 +118,7 @@ export function ContactSection() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
                     name="firstName"
-                    placeholder="Имя *"
+                    placeholder="Имя"
                     required
                     className="bg-white/10 border-white/20 text-white placeholder-white/50"
                   />
@@ -133,7 +133,7 @@ export function ContactSection() {
                   <Input
                     name="email"
                     type="email"
-                    placeholder="Email *"
+                    placeholder="Email"
                     required
                     className="bg-white/10 border-white/20 text-white placeholder-white/50"
                   />
@@ -149,7 +149,7 @@ export function ContactSection() {
                   <input type="hidden" name="type" value={projectType} />
                   <Select value={projectType} onValueChange={setProjectType}>
                     <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                      <SelectValue placeholder="Выберите тип проекта *" />
+                      <SelectValue placeholder="Выберите тип проекта" />
                     </SelectTrigger>
 
                     {/* фикс прозрачности дропдауна */}
@@ -170,7 +170,7 @@ export function ContactSection() {
                 <div className="mt-4">
                   <Textarea
                     name="message"
-                    placeholder="Расскажите о задаче: цель, длительность, пожелания по стилю, сроки и бюджет *"
+                    placeholder="Расскажите о задаче: цель, длительность, пожелания по стилю, сроки и бюджет"
                     required
                     className="min-h-[140px] bg-white/10 border-white/20 text-white placeholder-white/50"
                   />
@@ -270,11 +270,6 @@ export function ContactSection() {
                   🟢 Свободен для новых проектов
                 </div>
               </div>
-            </div>
-
-            <div className="text-center text-sm text-white/50">
-              Обычно отвечаю в течение дня • Консультации бесплатны • Давайте
-              сделаем что-то крутое
             </div>
           </div>
         </div>
