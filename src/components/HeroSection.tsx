@@ -4,10 +4,15 @@ import { ChevronDown, Play, ArrowRight, Star } from "lucide-react";
 
 export function HeroSection() {
   const scrollToPortfolio = () =>
-    document.getElementById("portfolio")?.scrollIntoView({ behavior: "smooth" });
+    document
+      .getElementById("portfolio")
+      ?.scrollIntoView({ behavior: "smooth" });
 
   return (
-    <section id="home" className="relative min-h-[80vh] flex items-center justify-center bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white">
+    <section
+      id="home"
+      className="relative min-h-[80vh] flex items-center justify-center bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white"
+    >
       <div className="max-w-4xl mx-auto px-6 text-center">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
           Качественный{" "}
@@ -17,29 +22,49 @@ export function HeroSection() {
         </h1>
 
         <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto mb-8">
-          5+ лет опыта (с 2020). Профессионально и быстро создаю ролики любой сложности под ваши задачи.
+          5+ лет опыта (с 2020). Профессионально и быстро создаю ролики любой
+          сложности под ваши задачи.
         </p>
 
         <div className="flex items-center justify-center gap-4 mb-12">
-          <Button onClick={scrollToPortfolio} className="bg-blue-600 hover:bg-blue-700">
+          <Button
+            onClick={scrollToPortfolio}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
             <Play className="mr-2 h-4 w-4" /> Смотреть портфолио
           </Button>
-          <a href="#contact" className="inline-flex items-center px-4 py-2 rounded-md border border-white/20 hover:bg-white/10">
+          <a
+            href="#contact"
+            className="inline-flex items-center px-4 py-2 rounded-md border border-white/20 hover:bg-white/10"
+          >
             Сотрудничать <ArrowRight className="ml-2 h-4 w-4" />
           </a>
         </div>
 
+        {/* Статистика */}
         <div className="grid grid-cols-3 gap-6 max-w-xl mx-auto text-left">
+          {/* 200+ заказов */}
           <div>
             <div className="text-2xl font-bold">200+</div>
             <div className="text-sm text-white/70">выполненных заказов</div>
           </div>
-          <div>
-            <div className="flex items-center gap-2 text-2xl font-bold">
+
+          {/* Рейтинг 5.0 — кликабельно */}
+          <a
+            href="https://uslugi.yandex.ru/profile/NikitaR-303813"
+            target="_blank"
+            rel="noreferrer"
+            className="block group"
+          >
+            <div className="flex items-center gap-2 text-2xl font-bold transition-colors group-hover:text-blue-400">
               5.0 <Star className="h-5 w-5 fill-current" />
             </div>
-            <div className="text-sm text-white/70">рейтинг (80+ отзывов)</div>
-          </div>
+            <div className="text-sm text-white/70 transition-colors group-hover:text-blue-200">
+              рейтинг (80+ отзывов)
+            </div>
+          </a>
+
+          {/* Опыт */}
           <div>
             <div className="text-2xl font-bold">5+</div>
             <div className="text-sm text-white/70">лет опыта, с 2020</div>

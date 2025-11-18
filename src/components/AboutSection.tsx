@@ -11,42 +11,48 @@ const skills = [
   "Motion Graphics",
   "Color Grading",
   "Audio Editing",
-  "Visual Effects"
+  "Visual Effects",
 ];
 
-// Achievements updated based on Nikita’s Yandex profile
-const achievements = [
+type Achievement = {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+  link?: string;
+};
+
+// <<< вот тут
+const achievements: Achievement[] = [
   {
     icon: Award,
     title: "Рейтинг 5.0",
-    description: "80+ отзывов"
+    description: "80+ отзывов",
+    link: "https://uslugi.yandex.ru/profile/NikitaR-303813",
   },
   {
     icon: Users,
     title: "200+ заказов",
-    description: "Выполненные проекты"
+    description: "Выполненные проекты",
   },
   {
     icon: Clock,
     title: "5+ лет опыта",
-    description: "В видеомонтаже с января 2020 года"
+    description: "В видеомонтаже с января 2020 года",
   },
   {
     icon: Star,
     title: "Индивидуальный подход",
-    description: "Каждый проект - уникален"
-  }
+    description: "Каждый проект — уникален",
+  },
 ];
+// >>>
 
 export function AboutSection() {
   return (
-    <section 
-    id="about"
-    className="py-20 bg-white">
-      
+    <section id="about" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Left column - Image and highlights */}
+          {/* левая колонка */}
           <div className="space-y-8">
             <div className="relative">
               <ImageWithFallback
@@ -60,18 +66,37 @@ export function AboutSection() {
               </div>
             </div>
 
-            {/* Achievement cards */}
+            {/* карточки достижений */}
             <div className="grid grid-cols-2 gap-4">
               {achievements.map((achievement, index) => {
                 const IconComponent = achievement.icon;
-                return (
-                  <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300">
+
+                const card = (
+                  <Card className="text-center hover:shadow-lg transition-shadow duration-300">
                     <CardContent className="p-4">
                       <IconComponent className="w-8 h-8 text-blue-600 mx-auto mb-3" />
-                      <h4 className="font-semibold text-gray-900 mb-1">{achievement.title}</h4>
-                      <p className="text-sm text-gray-600">{achievement.description}</p>
+                      <h4 className="font-semibold text-gray-900 mb-1">
+                        {achievement.title}
+                      </h4>
+                      <p className="text-sm text-gray-600">
+                        {achievement.description}
+                      </p>
                     </CardContent>
                   </Card>
+                );
+
+                return achievement.link ? (
+                  <a
+                    key={index}
+                    href={achievement.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block"
+                  >
+                    {card}
+                  </a>
+                ) : (
+                  <div key={index}>{card}</div>
                 );
               })}
             </div>
