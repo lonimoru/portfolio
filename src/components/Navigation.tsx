@@ -1,158 +1,200 @@
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Button } from "./ui/button";
-import { Menu, X, Play } from "lucide-react";
+import { Menu, Play, X } from "lucide-react";
+import { MOTION_EASE } from "../lib/motion";
 
 type NavItem = {
   name: string;
   href: string;
-  isRoute?: boolean; // ← ДОБАВИЛИ
+  section?: string;
+  isRoute?: boolean;
 };
 
 const navItems: NavItem[] = [
-  { name: "Главная", href: "#home" },
-  { name: "Портфолио", href: "#portfolio" },
-  { name: "Проекты", href: "/projects", isRoute: true },
-  { name: "Обо мне", href: "#about" },
-  { name: "Услуги", href: "#services" },
-  { name: "Контакты", href: "#contact" },
+  { name: "Главная", href: "#home", section: "home" },
+  { name: "Портфолио", href: "#portfolio", section: "portfolio" },
+  { name: "Проекты", href: "/projects", section: "projects", isRoute: true },
+  { name: "Обо мне", href: "#about", section: "about" },
+  { name: "Услуги", href: "#services", section: "services" },
+  { name: "Контакты", href: "#contact", section: "contact" },
 ];
-
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("home");
   const location = useLocation();
   const navigate = useNavigate();
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 50);
+    const onScroll = () => setIsScrolled(window.scrollY > 24);
     onScroll();
-    window.addEventListener("scroll", onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /** плавный скролл с учётом высоты шапки */
+  useEffect(() => {
+    setIsMenuOpen(false);
+    if (location.pathname === "/projects") {
+      setActiveSection("projects");
+      return;
+    }
+
+    const sections = navItems
+      .filter((item) => item.section && !item.isRoute)
+      .map((item) => document.getElementById(item.section ?? ""))
+      .filter((section): section is HTMLElement => Boolean(section));
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible?.target.id) setActiveSection(visible.target.id);
+      },
+      { rootMargin: "-22% 0px -62%", threshold: [0.08, 0.25, 0.55] },
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, [location.pathname]);
+
   const scrollToHash = (hash: string) => {
-    const id = hash.replace("#", "");
-    const el = document.getElementById(id);
-    if (!el) return;
-
-    const offset = 80; // примерная высота шапки
-    const top = el.getBoundingClientRect().top + window.scrollY - offset;
-
-    window.scrollTo({
-      top,
-      behavior: "smooth",
-    });
+    const target = document.getElementById(hash.replace("#", ""));
+    if (!target) return;
+    const top = target.getBoundingClientRect().top + window.scrollY - 76;
+    window.scrollTo({ top, behavior: reduceMotion ? "auto" : "smooth" });
   };
 
-  const go = (item: NavItem | { name: string; href: string; isRoute?: boolean }) => {
-    // 1. Отдельный роут (страница проектов)
+  const go = (item: NavItem) => {
     if (item.isRoute) {
       navigate(item.href);
-      setIsMenuOpen(false);
       return;
     }
 
-    // 2. Якоря (#home, #about и т.д.)
-    if (item.href.startsWith("#")) {
-      const hash = item.href;
-
-      // если мы НЕ на главной — уходим на /#about, /#services и т.п.
-      if (location.pathname !== "/") {
-        navigate("/" + hash);
-        setIsMenuOpen(false);
-        return;
-      }
-
-      // уже на главной
-      if (hash === "#home") {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } else {
-        scrollToHash(hash);
-      }
-
-      setIsMenuOpen(false);
+    if (location.pathname !== "/") {
+      navigate(`/${item.href}`);
       return;
     }
+
+    if (item.href === "#home") {
+      window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+    } else {
+      scrollToHash(item.href);
+    }
+    setIsMenuOpen(false);
   };
 
+  const contactItem = navItems.find((item) => item.section === "contact") ?? navItems[0];
+
   return (
-    <nav
-      className={`
-        fixed top-0 left-0 right-0 z-50
-        transition-all duration-300
-        ${isScrolled
-          ? "bg-slate-900/95 shadow-lg border-b border-white/10"
-          : "bg-slate-900/80 border-b border-white/5"
-        }
-        backdrop-blur
-      `}
+    <motion.header
+      initial={reduceMotion ? false : { opacity: 0, y: -18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: reduceMotion ? 0 : 0.7, ease: MOTION_EASE }}
+      className={`fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300 ${
+        isScrolled || isMenuOpen
+          ? "border-white/10 bg-[#0b1220]/[0.94] shadow-[0_12px_40px_-28px_rgba(0,0,0,.9)] backdrop-blur-xl"
+          : "border-white/5 bg-[#0b1220]/[0.76] backdrop-blur-md"
+      }`}
     >
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center justify-between h-16">
-          {/* Лого-кнопка домой */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <Play className="w-5 h-5 text-white" />
-            </div>
+      <nav className="site-container" aria-label="Основная навигация">
+        <div className="flex h-[72px] items-center justify-between gap-5">
+          <Link
+            to="/"
+            className="focus-ring flex shrink-0 items-center gap-3 rounded-lg text-white"
+            aria-label="Никита Резепов — на главную"
+          >
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 shadow-lg shadow-blue-950/30">
+              <Play className="h-4 w-4 fill-current" />
+            </span>
+            <span className="hidden text-[15px] font-bold tracking-tight sm:block">
+              Никита Резепов
+            </span>
           </Link>
 
-          {/* Десктопное меню */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
-              <button
-                key={item.name}
-                onClick={() => go(item)}
-                className="font-medium transition-colors text-white/80 hover:text-white"
-              >
-                {item.name}
-              </button>
-            ))}
-
-            <Button
-              onClick={() => go({ name: "Контакты", href: "#contact" })}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              Оставить заявку
-            </Button>
+          <div className="hidden items-center gap-1 lg:flex">
+            {navItems.map((item) => {
+              const active = activeSection === item.section;
+              return (
+                <button
+                  key={item.name}
+                  type="button"
+                  onClick={() => go(item)}
+                  className={`focus-ring relative rounded-lg px-3 py-3 text-[15px] font-semibold transition-colors ${
+                    active ? "text-white" : "text-slate-300 hover:text-white"
+                  }`}
+                  aria-current={active ? "page" : undefined}
+                >
+                  {item.name}
+                  {active && (
+                    <motion.span
+                      layoutId="active-nav"
+                      className="absolute inset-x-3 bottom-1 h-0.5 rounded-full bg-blue-400"
+                      transition={{ duration: reduceMotion ? 0 : 0.28, ease: MOTION_EASE }}
+                    />
+                  )}
+                </button>
+              );
+            })}
           </div>
 
-          {/* Мобильный бургер */}
-          <div className="md:hidden">
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => setIsMenuOpen((v) => !v)}
-              className="p-2 text-white"
+              type="button"
+              onClick={() => go(contactItem)}
+              className="primary-button focus-ring hidden min-h-11 px-5 text-sm sm:inline-flex"
             >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              Обсудить проект
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsMenuOpen((open) => !open)}
+              className="focus-ring inline-flex h-11 w-11 items-center justify-center rounded-xl border border-white/15 text-white lg:hidden"
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-navigation"
+              aria-label={isMenuOpen ? "Закрыть меню" : "Открыть меню"}
+            >
+              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
 
-        {/* Мобильное меню */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-slate-900 border-t border-white/10 shadow-lg">
-            <div className="px-4 py-4 space-y-4">
-              {navItems.map((item) => (
-                <button
-                  key={item.name}
-                  onClick={() => go(item)}
-                  className="block w-full text-left py-2 text-white/80 hover:text-white font-medium transition-colors"
-                >
-                  {item.name}
-                </button>
-              ))}
-              <Button
-                onClick={() => go({ name: "Контакты", href: "#contact" })}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-4"
-              >
-                Оставить заявку
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
-    </nav>
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              id="mobile-navigation"
+              initial={reduceMotion ? false : { height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: reduceMotion ? 0 : 0.28, ease: MOTION_EASE }}
+              className="overflow-hidden lg:hidden"
+            >
+              <div className="grid gap-1 border-t border-white/10 py-4">
+                {navItems.map((item) => (
+                  <button
+                    key={item.name}
+                    type="button"
+                    onClick={() => go(item)}
+                    className={`focus-ring flex min-h-12 items-center justify-between rounded-xl px-4 text-left text-base font-semibold ${
+                      activeSection === item.section
+                        ? "bg-white/10 text-white"
+                        : "text-slate-300 hover:bg-white/5 hover:text-white"
+                    }`}
+                  >
+                    {item.name}
+                    {activeSection === item.section && (
+                      <span className="h-2 w-2 rounded-full bg-blue-400" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </nav>
+    </motion.header>
   );
 }

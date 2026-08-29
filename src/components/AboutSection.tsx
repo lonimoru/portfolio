@@ -1,149 +1,91 @@
-import { Card, CardContent } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Award, Users, Clock, Star } from "lucide-react";
+import { Award, Clock3, Star } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { Reveal, StaggerGroup, StaggerItem } from "./Reveal";
+import { SectionHeading } from "./SectionHeading";
 
 const skills = [
   "Adobe Premiere Pro",
   "After Effects",
   "DaVinci Resolve",
-  "AI Tools",
   "Motion Graphics",
   "Color Grading",
   "Audio Editing",
   "Visual Effects",
+  "AI Tools",
 ];
 
-type Achievement = {
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  description: string;
-  link?: string;
-};
-
-// <<< вот тут
-const achievements: Achievement[] = [
-  {
-    icon: Award,
-    title: "Рейтинг 5.0",
-    description: "80+ отзывов",
-    link: "https://uslugi.yandex.ru/profile/NikitaR-303813",
-  },
-  {
-    icon: Users,
-    title: "200+ заказов",
-    description: "Выполненные проекты",
-  },
-  {
-    icon: Clock,
-    title: "5+ лет опыта",
-    description: "В видеомонтаже с января 2020 года",
-  },
-  {
-    icon: Star,
-    title: "Индивидуальный подход",
-    description: "Каждый проект — уникален",
-  },
+const facts = [
+  { icon: Award, value: "200+", label: "выполненных заказов" },
+  { icon: Star, value: "5.0", label: "рейтинг по 80+ отзывам" },
+  { icon: Clock3, value: "6 лет", label: "практики с 2020 года" },
 ];
-// >>>
+
+function FactsRow({ className = "" }: { className?: string }) {
+  return (
+    <StaggerGroup
+      className={`about-stats-row overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035] ${className}`}
+    >
+      {facts.map(({ icon: Icon, value, label }) => (
+        <StaggerItem key={label} className="p-4">
+          <Icon className="mb-3 h-4 w-4 text-blue-300" />
+          <strong className="block text-lg font-bold text-white">{value}</strong>
+          <span className="mt-1 block text-xs leading-snug text-slate-400">{label}</span>
+        </StaggerItem>
+      ))}
+    </StaggerGroup>
+  );
+}
 
 export function AboutSection() {
   return (
-    <section id="about" className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* левая колонка */}
-          <div className="space-y-8">
-            <div className="relative">
+    <section id="about" className="section-shell relative overflow-hidden bg-[#111827] text-white">
+      <div className="absolute -right-24 top-24 h-80 w-80 rounded-full bg-blue-600/10 blur-3xl" aria-hidden="true" />
+      <div className="site-container relative grid gap-12 lg:grid-cols-[minmax(340px,0.82fr)_minmax(0,1.18fr)] lg:items-start lg:gap-20">
+        <div className="mx-auto w-full max-w-[570px] lg:mx-0">
+          <Reveal className="relative">
+            <div className="relative overflow-hidden rounded-[1.6rem] border border-white/10 bg-slate-900 shadow-2xl shadow-black/25">
               <ImageWithFallback
-                src="/gemini-2.5-flash-image-preview_(nano-banana)_create_a_profile_pho (2) копия.png"
-                alt="Video Editor Portrait"
-                className="w-full max-w-md mx-auto rounded-2xl shadow-2xl"
+                src="/diploma.webp"
+                alt="Портрет видеомонтажёра Никиты Резепова"
+                className="aspect-square w-full object-cover"
               />
-              <div className="absolute -bottom-6 -right-6 bg-blue-600 text-white p-4 rounded-xl shadow-lg">
-                <div className="text-2xl font-bold">5+</div>
-                <div className="text-sm">лет опыта</div>
-              </div>
             </div>
+          </Reveal>
+          <FactsRow className="mt-4 hidden grid-cols-3 lg:grid" />
+        </div>
 
-            {/* карточки достижений */}
-            <div className="grid grid-cols-2 gap-4">
-              {achievements.map((achievement, index) => {
-                const IconComponent = achievement.icon;
+        <div>
+          <SectionHeading eyebrow="Обо мне" title="Монтаж, который работает на историю" inverted />
+          <StaggerGroup className="mt-8 space-y-5 text-[clamp(1rem,1.35vw,1.14rem)] leading-relaxed text-slate-300">
+            <StaggerItem>
+              <p>
+                Меня зовут Никита. Я занимаюсь видеомонтажом с 2020 года и собираю ролики разной сложности — от короткого промо до длинного YouTube-формата.
+              </p>
+            </StaggerItem>
+            <StaggerItem>
+              <p>
+                Работаю удалённо по всей России. На Яндекс Услугах выполнил более 200 заказов и получил рейтинг 5.0 на основе 80+ отзывов.
+              </p>
+            </StaggerItem>
+            <StaggerItem>
+              <p>
+                В основе моей работы — ритм, понятная история, аккуратный звук и визуальная цельность. AI-инструменты использую как дополнение к монтажу: для создания недостающих сцен, анимации изображений, разработки визуальных концепций и ускорения отдельных этапов работы.
+              </p>
+            </StaggerItem>
+          </StaggerGroup>
 
-                const card = (
-                  <Card className="text-center hover:shadow-lg transition-shadow duration-300">
-                    <CardContent className="p-4">
-                      <IconComponent className="w-8 h-8 text-blue-600 mx-auto mb-3" />
-                      <h4 className="font-semibold text-gray-900 mb-1">
-                        {achievement.title}
-                      </h4>
-                      <p className="text-sm text-gray-600">
-                        {achievement.description}
-                      </p>
-                    </CardContent>
-                  </Card>
-                );
+          <FactsRow className="mt-9 grid grid-cols-1 sm:grid-cols-3 lg:hidden" />
 
-                return achievement.link ? (
-                  <a
-                    key={index}
-                    href={achievement.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="block"
-                  >
-                    {card}
-                  </a>
-                ) : (
-                  <div key={index}>{card}</div>
-                );
-              })}
+          <Reveal className="mt-9">
+            <h3 className="text-lg font-bold text-white">Инструменты и компетенции</h3>
+            <div className="mt-4 flex flex-wrap gap-2.5">
+              {skills.map((skill) => (
+                <span key={skill} className="rounded-full border border-white/12 bg-white/[0.045] px-3 py-1.5 text-sm font-semibold text-slate-300">
+                  {skill}
+                </span>
+              ))}
             </div>
-          </div>
-
-          {/* Right column - About content */}
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                Обо&nbsp;мне
-              </h2>
-              <div className="space-y-4 text-gray-600 text-lg leading-relaxed">
-                {/* Updated biography to reflect Nikita’s background */}
-                <p>
-                  Приветствую! Меня зовут Никита, я видеомонтажёр с опытом более пяти лет и я готов выполнить задачи любой сложности быстро и качественно.
-                </p>
-                <p>
-                  Я окончил Волгоградский государственный технический университет и работаю 
-                  удаленно по всей России, проживая в Волгограде. На платформе Яндекс Услуги 
-                  реализовал десятки проектов для клиентов и получил рейтинг 5.0 на основе 80+ отзывов.
-                </p>
-                <p>
-                  Я убеждён, что грамотный монтаж усиливает историю и эмоции, создавая цельный и естественный 
-                  видеоряд.
-                </p>
-              </div>
-            </div>
-
-            {/* Skills */}
-            <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                Навыки и&nbsp;компетенции
-              </h3>
-              <div className="flex flex-wrap gap-3">
-                {skills.map((skill) => (
-                  <Badge key={skill} variant="outline" className="px-3 py-1 text-sm hover:bg-blue-50 hover:border-blue-300 transition-colors">
-                    {skill}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-
-            
-               
-              
-            
-          </div>
+          </Reveal>
         </div>
       </div>
     </section>

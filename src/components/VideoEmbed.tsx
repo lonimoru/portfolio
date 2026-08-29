@@ -1,102 +1,111 @@
-// src/components/VideoEmbed.tsx
 import { useState } from "react";
+import { ExternalLink } from "lucide-react";
+import { toYouTubeId } from "../lib/video";
 
 export type Ratio = "16:9" | "9:16";
 
-export function toYouTubeId(input: string): string {
-  try {
-    const str = input.trim();
-
-    // 1) быстрый регекс: вытягиваем 11-символьный ID из watch?v=, youtu.be/, /shorts/
-    const m = str.match(
-      /(?:v=|\/shorts\/|youtu\.be\/)([A-Za-z0-9_-]{11})/
-    );
-    if (m && m[1]) return m[1];
-
-    // 2) запасной путь — полноценный разбор URL
-    const url = new URL(str);
-
-    // https://youtu.be/ID
-    if (url.hostname.includes("youtu.be")) {
-      return url.pathname.split("/").filter(Boolean)[0] || "";
-    }
-
-    // https://www.youtube.com/shorts/ID
-    if (url.hostname.includes("youtube.com") && url.pathname.startsWith("/shorts/")) {
-      return url.pathname.split("/shorts/")[1]?.split("?")[0]?.split("&")[0] || "";
-    }
-
-    // https://www.youtube.com/watch?v=ID
-    if (url.hostname.includes("youtube.com")) {
-      const v = url.searchParams.get("v");
-      if (v && v.length === 11) return v;
-    }
-  } catch {
-    // ignore
-  }
-  return "";
-}
-
 type Props = {
-  id: string;          // YouTube id
-  title: string;       // твой заголовок (мы показываем его СНИЗУ, а не внутри плеера)
-  ratio?: Ratio;       // "16:9" | "9:16"
-  privacy?: boolean;   // youtube-nocookie
+  id?: string;
+  url?: string;
+  title: string;
+  ratio?: Ratio;
+  privacy?: boolean;
+  directVideoUrl?: string;
+  directVideoWebmUrl?: string;
+  posterUrl?: string;
+  externalVideoUrl?: string;
+  autoPlay?: boolean;
 };
 
-export function VideoEmbed({ id, title, ratio = "16:9", privacy = true }: Props) {
-  const [play, setPlay] = useState(false);
-
+export function VideoEmbed({
+  id,
+  url,
+  title,
+  ratio = "16:9",
+  privacy = true,
+  directVideoUrl,
+  directVideoWebmUrl,
+  posterUrl,
+  externalVideoUrl,
+  autoPlay = true,
+}: Props) {
+  const fallbackUrl = externalVideoUrl ?? url ?? "";
+  const [failedDirectVideoUrl, setFailedDirectVideoUrl] = useState<string | null>(null);
+  const directVideoFailed = Boolean(
+    directVideoUrl && failedDirectVideoUrl === directVideoUrl,
+  );
+  const youtubeId = id ?? toYouTubeId(fallbackUrl);
   const iframeSrc =
-    `https://www.youtube${privacy ? "-nocookie" : ""}.com/embed/${id}` +
-    `?autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&color=white`;
-
-  // Обложка (без текста и аватарки ютуба)
-  const thumb = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
-  const padding = ratio === "9:16" ? "177.78%" : "56.25%";
+    `https://www.youtube${privacy ? "-nocookie" : ""}.com/embed/${youtubeId}` +
+    `?autoplay=${autoPlay ? "1" : "0"}&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&color=white`;
+  const aspectRatio = ratio === "9:16" ? "9 / 16" : "16 / 9";
 
   return (
-    <div className="w-full">
-      <div
-        className="relative w-full overflow-hidden rounded-2xl bg-black shadow-md"
-        style={{ paddingBottom: padding }}
-      >
-        {play ? (
+    <div
+      className={`relative mx-auto w-full overflow-hidden rounded-2xl bg-black ${
+        ratio === "9:16" ? "max-w-[420px]" : ""
+      }`}
+      style={{ aspectRatio }}
+    >
+      {directVideoUrl && !directVideoFailed ? (
+        <video
+          key={directVideoUrl}
+          className="h-full w-full object-contain"
+          controls
+          playsInline
+          preload="metadata"
+          poster={posterUrl}
+          onError={() => setFailedDirectVideoUrl(directVideoUrl)}
+        >
+          {directVideoWebmUrl && <source src={directVideoWebmUrl} type="video/webm" />}
+          <source src={directVideoUrl} type="video/mp4" />
+          Ваш браузер не поддерживает воспроизведение видео.
+        </video>
+      ) : directVideoFailed ? (
+        <div
+          className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center text-white"
+          role="status"
+        >
+          <p className="max-w-sm text-sm leading-relaxed text-slate-300">
+            Не удалось загрузить видео с прямого источника.
+          </p>
+          {fallbackUrl && (
+            <a
+              href={fallbackUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="focus-ring inline-flex items-center gap-2 rounded-full border border-white/25 px-5 py-3 font-semibold transition hover:bg-white hover:text-slate-950"
+            >
+              Открыть внешнее видео
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          )}
+        </div>
+      ) : youtubeId ? (
           <iframe
-            className="absolute left-0 top-0 h-full w-full"
+            className="h-full w-full"
             src={iframeSrc}
             title={title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
-            loading="lazy"
+            loading="eager"
           />
-        ) : (
-          <button
-            type="button"
-            onClick={() => setPlay(true)}
-            className="group absolute inset-0 h-full w-full"
-            aria-label={`Смотреть: ${title}`}
+      ) : fallbackUrl ? (
+        <div className="flex h-full items-center justify-center p-8 text-center text-white">
+          <a
+            href={fallbackUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="rounded-full border border-white/25 px-5 py-3 font-semibold transition hover:bg-white hover:text-slate-950"
           >
-            <img
-              src={thumb}
-              alt=""
-              loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-black/30 transition-colors group-hover:bg-black/15" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-white/95 shadow-lg group-hover:scale-105 transition">
-                {/* Иконка play */}
-                <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden>
-                  <path d="M8 5v14l11-7z" fill="currentColor" />
-                </svg>
-              </span>
-            </div>
-          </button>
-        )}
-      </div>
-      {/* Заголовок показываем уже СВОИМ текстом */}
-      {/* (оставь как у тебя в карточках/страницах) */}
+            Открыть видео
+          </a>
+        </div>
+      ) : (
+        <div className="flex h-full items-center justify-center text-sm text-slate-400">
+          Видео пока недоступно
+        </div>
+      )}
     </div>
   );
 }

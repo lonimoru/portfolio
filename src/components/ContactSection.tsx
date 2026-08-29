@@ -1,276 +1,184 @@
 import { useState } from "react";
-import { Button } from "./ui/button";
-import { Card, CardContent } from "./ui/card";
-import { Input } from "./ui/input";
-import { Textarea } from "./ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
+import { Link } from "react-router-dom";
+import { ArrowUpRight, CheckCircle2, Images, Mail, Phone } from "lucide-react";
+import { Reveal, StaggerGroup, StaggerItem } from "./Reveal";
+import { SectionHeading } from "./SectionHeading";
 
-import {
-  CheckCircle2,
-  Phone,
-  Mail,
-  MapPin,
-  Clock,
-  Play,
-  Images,
-  GraduationCap,
-  PercentCircle,
-  ExternalLink,
-} from "lucide-react";
-
-/** endpoint Formspree */
 const FORMSPREE_ENDPOINT = "https://formspree.io/f/xeolbeaj";
 
-/** карточки справа */
-const CONTACT_CARDS = [
+const contactLinks = [
   {
     icon: Mail,
-    title: "Профиль Яндекс",
-    text: "Написать сообщение",
+    label: "Яндекс Услуги",
+    value: "Написать в профиль",
     href: "https://uslugi.yandex.ru/profile/NikitaR-303813",
   },
-  { icon: Phone, title: "Телефон для связи", text: "+79377056859", },
-  { icon: MapPin, title: "География", text: "Волгоград. Удаленно по России" },
-  { icon: Clock, title: "Время связи", text: "с 11:00 до 22:00" },
+  {
+    icon: Phone,
+    label: "Телефон",
+    value: "+7 937 705-68-59",
+    href: "tel:+79377056859",
+  },
+  {
+    icon: Images,
+    label: "Все проекты",
+    value: "Открыть архив",
+    href: "/projects",
+    internal: true,
+  },
 ];
 
-const SOCIAL_CARDS = [
-  { icon: Play, title: "Showreel 2021", text: "01:21", href: "https://youtu.be/n3rUELxETK0" },
-  { icon: Images, title: "Портфолио", text: "Примеры работ", href: "/projects" },
-  { icon: GraduationCap, title: "Образование", text: "ВолгГТУ" },
-  { icon: PercentCircle, title: "Скидка 10%", text: "Постоянным клиентам" },
-];
-
-const PROJECT_TYPES = [
+const projectTypes = [
   "Рекламный ролик",
   "Ролик для соцсетей",
-  "Свадебное видео",
-  "Презентация/инфографика",
-  "Интро/анимация логотипа",
+  "YouTube-видео",
+  "Поздравительное или семейное видео",
+  "Свадебное или событийное видео",
+  "Ролик из фотографий / слайд-шоу",
+  "Презентация / инфографика",
+  "Интро / анимация логотипа",
+  "AI-видео / визуалы",
   "Другое",
 ];
 
 export function ContactSection() {
-  const [status, setStatus] =
-    useState<"idle" | "sending" | "ok" | "error">("idle");
-  const [errorMsg, setErrorMsg] = useState("");
-  const [projectType, setProjectType] = useState<string>("");
+  const [status, setStatus] = useState<"idle" | "sending" | "ok" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
-    e.preventDefault();
-    if (!projectType) {
-      setErrorMsg("Выберите тип проекта.");
-      return;
-    }
+  const onSubmit: React.FormEventHandler<HTMLFormElement> = async (event) => {
+    event.preventDefault();
     setStatus("sending");
-    setErrorMsg("");
+    setErrorMessage("");
 
-    const form = e.currentTarget;
+    const form = event.currentTarget;
     const data = new FormData(form);
-
-    // доп.тех. поля
     data.append("_subject", "Новая заявка с сайта");
     data.append("page", window.location.href);
 
     try {
-      const res = await fetch(FORMSPREE_ENDPOINT, {
+      const response = await fetch(FORMSPREE_ENDPOINT, {
         method: "POST",
         headers: { Accept: "application/json" },
         body: data,
       });
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       setStatus("ok");
       form.reset();
-      setProjectType("");
-    } catch (err) {
+    } catch {
       setStatus("error");
-      setErrorMsg(
-        "Не удалось отправить форму. Попробуйте ещё раз или напишите напрямую."
-      );
+      setErrorMessage("Не получилось отправить сообщение. Попробуйте ещё раз или свяжитесь через Яндекс Услуги.");
     }
   };
 
   return (
-    <section id="contact" className="py-20 bg-[#0f1623] text-white">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-3">
-            Давайте создавать вместе
-          </h2>
-          <p className="text-white/70 max-w-2xl mx-auto">
-            Готовы воплотить вашу идею в жизнь? Напишите — обсудим задачу,
-            сроки и бюджет.
-          </p>
-        </div>
+    <section id="contact" className="section-shell bg-[#0b1220] text-white">
+      <div className="site-container">
+        <SectionHeading
+          eyebrow="Контакты"
+          title="Давайте обсудим ваш ролик"
+          description="Расскажите о задаче, исходниках и желаемом результате. Я отвечу и предложу понятный следующий шаг."
+          inverted
+        />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Форма */}
-          <Card className="bg-white/5 border-white/10">
-            <CardContent className="p-6">
-              <form onSubmit={onSubmit}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Input
-                    name="firstName"
-                    placeholder="Имя"
-                    required
-                    className="bg-white/10 border-white/20 text-white placeholder-white/50"
-                  />
-                  <Input
-                    name="lastName"
-                    placeholder="Фамилия"
-                    className="bg-white/10 border-white/20 text-white placeholder-white/50"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                  <Input
-                    name="email"
-                    type="email"
-                    placeholder="Email"
-                    required
-                    className="bg-white/10 border-white/20 text-white placeholder-white/50"
-                  />
-                  <Input
-                    name="phone"
-                    placeholder="Телефон"
-                    className="bg-white/10 border-white/20 text-white placeholder-white/50"
-                  />
-                </div>
-
-                <div className="mt-4">
-                  {/* скрытый input, чтобы значение ушло в Formspree */}
-                  <input type="hidden" name="type" value={projectType} />
-                  <Select value={projectType} onValueChange={setProjectType}>
-                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                      <SelectValue placeholder="Выберите тип проекта" />
-                    </SelectTrigger>
-
-                    {/* фикс прозрачности дропдауна */}
-                    <SelectContent className="bg-[#1b2433] text-white border border-white/20 rounded-md shadow-lg">
-                      {PROJECT_TYPES.map((t) => (
-                        <SelectItem
-                          key={t}
-                          value={t}
-                          className="cursor-pointer data-[highlighted]:bg-blue-600 data-[highlighted]:text-white"
-                        >
-                          {t}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="mt-4">
-                  <Textarea
-                    name="message"
-                    placeholder="Расскажите о задаче: цель, длительность, пожелания по стилю, сроки и бюджет"
-                    required
-                    className="min-h-[140px] bg-white/10 border-white/20 text-white placeholder-white/50"
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={status === "sending" || !projectType}
-                  className="mt-6 w-full bg-blue-600 hover:bg-blue-700"
-                >
-                  {status === "sending" ? "Отправляю…" : "Отправить сообщение"}
-                </Button>
-
-                {status === "ok" && (
-                  <div className="mt-4 flex items-center gap-2 text-green-400">
-                    <CheckCircle2 className="w-5 h-5" />
-                    Сообщение отправлено! Я свяжусь с вами в ближайшее время.
-                  </div>
-                )}
-                {(status === "error" || errorMsg) && (
-                  <div className="mt-4 text-red-400">{errorMsg}</div>
-                )}
-
-                <p className="mt-3 text-xs text-white/50">
-                  Нажимая «Отправить сообщение», вы принимаете политику
-                  обработки персональных данных.
-                </p>
-              </form>
-            </CardContent>
-          </Card>
-
-          {/* Правая колонка */}
-          <div className="space-y-6">
-            <div className="grid sm:grid-cols-2 gap-4">
-              {CONTACT_CARDS.map((c) => {
-                const Icon = c.icon as typeof Mail;
-                return (
-                  <a
-                    key={c.title}
-                    href={c.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="block rounded-xl bg-white/5 border border-white/10 p-4 hover:bg-white/10 transition"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5 p-2 rounded-lg bg-white/10">
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <div className="text-sm text-white/60">{c.title}</div>
-                        <div className="mt-1 font-semibold inline-flex items-center gap-1">
-                          {c.text}
-                          {c.href && <ExternalLink className="w-4 h-4 opacity-70" />}
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                );
-              })}
-            </div>
-
-            <div className="grid sm:grid-cols-2 gap-4">
-              {SOCIAL_CARDS.map((c) => {
-                const Icon = c.icon as typeof Play;
-                return (
-                  <a
-                    key={c.title}
-                    href={c.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="block rounded-xl bg-white/5 border border-white/10 p-4 hover:bg-white/10 transition"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5 p-2 rounded-lg bg-white/10">
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <div className="text-sm text-white/60">{c.title}</div>
-                        <div className="mt-1 font-semibold inline-flex items-center gap-1">
-                          {c.text}
-                          {c.href && <ExternalLink className="w-4 h-4 opacity-70" />}
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                );
-              })}
-            </div>
-
-            <div className="rounded-xl p-6 bg-gradient-to-r from-blue-600 to-purple-600">
-              <div className="text-center">
-                <div className="text-lg font-bold">Принимаю заказы</div>
-                <div className="text-white/90 mt-1">
-                  Сейчас принимаю новые проекты. Бронируйте время заранее!
-                </div>
-                <div className="mt-3 text-sm opacity-90">
-                  🟢 Свободен для новых проектов
-                </div>
+        <div className="mt-12 grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] lg:gap-16">
+          <Reveal>
+            <form onSubmit={onSubmit} className="rounded-2xl border border-white/10 bg-white/[0.045] p-5 sm:p-7">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="grid gap-2 text-sm font-semibold text-slate-300">
+                  Имя
+                  <input name="name" required autoComplete="given-name" className="field-control" placeholder="Ваше имя" />
+                </label>
+                <label className="grid gap-2 text-sm font-semibold text-slate-300">
+                  Фамилия
+                  <input name="surname" autoComplete="family-name" className="field-control" placeholder="Фамилия" />
+                </label>
+                <label className="grid gap-2 text-sm font-semibold text-slate-300">
+                  Email
+                  <input name="email" type="email" required autoComplete="email" className="field-control" placeholder="name@example.ru" />
+                </label>
+                <label className="grid gap-2 text-sm font-semibold text-slate-300">
+                  Телефон
+                  <input name="phone" type="tel" autoComplete="tel" className="field-control" placeholder="+7 900 000-00-00" />
+                </label>
               </div>
-            </div>
+
+              <label className="mt-4 grid gap-2 text-sm font-semibold text-slate-300">
+                Тип проекта
+                <select name="type" required defaultValue="" className="field-control">
+                  <option value="" disabled className="text-slate-900">Выберите тип проекта</option>
+                  {projectTypes.map((type) => (
+                    <option key={type} value={type} className="text-slate-900">{type}</option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="mt-4 grid gap-2 text-sm font-semibold text-slate-300">
+                О задаче
+                <textarea
+                  name="message"
+                  required
+                  rows={6}
+                  className="field-control resize-y"
+                  placeholder="Цель, длительность, пожелания по стилю, сроки и ориентир по бюджету"
+                />
+              </label>
+
+              <button type="submit" disabled={status === "sending"} className="primary-button focus-ring mt-6 w-full disabled:cursor-wait disabled:opacity-65">
+                {status === "sending" ? "Отправляю…" : "Отправить сообщение"}
+                <ArrowUpRight className="h-4 w-4" />
+              </button>
+
+              {status === "ok" && (
+                <p className="mt-4 flex items-start gap-2 text-sm text-emerald-300" role="status">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+                  Сообщение отправлено. Я свяжусь с вами в ближайшее время.
+                </p>
+              )}
+              {status === "error" && <p className="mt-4 text-sm text-red-300" role="alert">{errorMessage}</p>}
+
+              <p className="mt-4 text-xs leading-relaxed text-slate-500">
+                Нажимая «Отправить сообщение», вы соглашаетесь на обработку переданных данных для ответа на заявку.
+              </p>
+            </form>
+          </Reveal>
+
+          <div>
+            <Reveal>
+              <p className="text-base leading-relaxed text-slate-300">
+                Удобнее написать напрямую? Выберите подходящий способ связи или откройте полный архив работ.
+              </p>
+            </Reveal>
+            <StaggerGroup className="mt-6 grid gap-3">
+              {contactLinks.map(({ icon: Icon, label, value, href, internal }) => {
+                const content = (
+                  <>
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10 text-blue-300">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">{label}</span>
+                      <span className="mt-1 block text-base font-semibold text-white">{value}</span>
+                    </span>
+                    <ArrowUpRight className="ml-auto h-5 w-5 shrink-0 text-slate-500 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white" />
+                  </>
+                );
+
+                return (
+                  <StaggerItem key={label}>
+                    {internal ? (
+                      <Link to={href} className="focus-ring group flex items-center gap-4 rounded-2xl border border-white/10 p-4 transition hover:border-white/25 hover:bg-white/[0.055]">
+                        {content}
+                      </Link>
+                    ) : (
+                      <a href={href} target={href.startsWith("http") ? "_blank" : undefined} rel={href.startsWith("http") ? "noreferrer" : undefined} className="focus-ring group flex items-center gap-4 rounded-2xl border border-white/10 p-4 transition hover:border-white/25 hover:bg-white/[0.055]">
+                        {content}
+                      </a>
+                    )}
+                  </StaggerItem>
+                );
+              })}
+            </StaggerGroup>
           </div>
         </div>
       </div>

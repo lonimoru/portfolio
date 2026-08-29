@@ -1,20 +1,22 @@
-// src/components/ServicesSection.tsx
-import { Card, CardContent, CardHeader } from "./ui/card";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
+import type { ComponentType } from "react";
+import { motion } from "framer-motion";
 import {
+  ArrowRight,
+  Check,
   Clapperboard,
-  Megaphone,
   Heart,
-  Wand2,
+  Megaphone,
   MonitorPlay,
   Palette,
-  Check,
-  ArrowRight,
+  Sparkles,
+  Wand2,
 } from "lucide-react";
+import { revealVariants } from "../lib/motion";
+import { Reveal, StaggerGroup, StaggerItem } from "./Reveal";
+import { SectionHeading } from "./SectionHeading";
 
 type Service = {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: ComponentType<{ className?: string }>;
   title: string;
   description: string;
   features: string[];
@@ -26,211 +28,185 @@ const services: Service[] = [
   {
     icon: Clapperboard,
     title: "Классический монтаж роликов",
-    description:
-      "Праздничные, корпоративные, для соцсетей (Reels, Shorts) и т.д.",
-    features: [
-      "Быстрая нарезка и склейка",
-      "Титры и простая графика",
-      "Подбор музыки",
-      "Цветокоррекция",
-    ],
+    description: "Праздничные, корпоративные и вертикальные видео для Reels и Shorts.",
+    features: ["Нарезка и сборка", "Титры и графика", "Музыка", "Цветокоррекция"],
     price: "от 1 000 ₽",
     popular: true,
   },
   {
     icon: Megaphone,
-    title: "Рекламные и презентационные",
-    description:
-      "Продающие и презентационные видео для бизнеса, мероприятий и проектов.",
-    features: [
-      "Сценарий и концепция",
-      "Инфографика / слайд-дизайн",
-      "Озвучка (по запросу)",
-      "Оптимизация под ЦА",
-    ],
-    price: "от 3 000 ₽",
+    title: "Реклама и презентационные видео",
+    description: "Продающие и информационные ролики для бизнеса, мероприятий и проектов.",
+    features: ["Сценарий и концепция", "Инфографика", "Озвучка", "Адаптация под аудиторию"],
+    price: "от 2 000 ₽",
   },
   {
     icon: Heart,
-    title: "Свадебные и событийные",
-    description:
-      "Монтаж церемоний, банкетов и, в целом, самых важных моментов.",
-    features: ["Хайлайт-ролик", "Полная церемония", "Монтаж банкета", "Сохранение важных моментов"],
-    price: "от 15 000 ₽",
+    title: "Свадебные и событийные видео",
+    description: "Монтаж церемоний, банкетов и важных моментов без потери живых эмоций.",
+    features: ["Хайлайт-ролик", "Полная церемония", "Монтаж банкета", "Архив важных сцен"],
+    price: "от 5 000 ₽",
   },
   {
     icon: Wand2,
     title: "Постпродакшн",
-    description:
-      "Финальная обработка: улучшаю картинку и звук, довожу ролик до «идеала».",
-    features: ["Цветокоррекция", "Чистка шумов, улучшение качества", "Звуковая обработка"],
-    price: "от 1 500 ₽",
+    description: "Финальная обработка изображения и звука, чтобы ролик выглядел цельно.",
+    features: ["Цветокоррекция", "Чистка шумов", "Улучшение качества", "Обработка звука"],
+    price: "от 1 000 ₽",
   },
   {
     icon: MonitorPlay,
     title: "Ролики из фотографий",
-    description:
-      "Динамичные слайд-шоу из ваших фото с переходами и музыкой.",
-    features: ["Анимация фото", "Красивые переходы", "Подбор музыки"],
-    price: "от 2 000 ₽",
+    description: "Динамичные слайд-шоу из ваших фотографий с переходами и музыкой.",
+    features: ["Анимация фото", "Переходы", "Подбор музыки"],
+    price: "от 1 500 ₽",
   },
   {
     icon: Palette,
     title: "Интро и анимация логотипа",
-    description:
-      "Фирменные заставки и эффектная анимация логотипа для ваших видео.",
+    description: "Фирменные заставки и motion-графика для видео и каналов.",
     features: ["Дизайн интро", "Анимация логотипа", "Выбор стиля"],
-    price: "от 1 000 ₽",
+    price: "от 1 500 ₽",
   },
 ];
 
 const addOns = [
-  { name: "Срочный монтаж(до 24 ч)", price: "от 50% до 100% к цене" },
-  { name: "Дополнительные правки", price: "~500 ₽ каждая" },
-  { name: "Улучшения качества видео(ИИ)", price: "1000 ₽" },
-  { name: "Экспорт в несколько форматов", price: "500 ₽" },
+  ["Срочный монтаж до 24 часов", "+50–100% к стоимости"],
+  ["Дополнительные правки", "около 500 ₽ каждая"],
+  ["Улучшение качества / апскейл короткого видео", "от 500 ₽"],
+  ["Адаптация ролика под другой формат", "от 500 ₽"],
+];
+
+const additionalCapabilities = [
+  "AI-генерация видео и изображений",
+  "Анимация изображений и недостающие сцены",
+  "Обложки, превью и визуальные концепции",
+  "AI-озвучка и подготовка голоса",
+  "Сценарий, структура и раскадровка ролика",
+  "Простые лендинги, Telegram-боты и AI-прототипы",
 ];
 
 function scrollToContact() {
-  // если на главной — мягкий скролл; если нет — перейдём на /#contact
-  if (location.pathname === "/") {
+  if (window.location.pathname === "/") {
     document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
   } else {
-    location.href = "/#contact";
+    window.location.href = "/#contact";
   }
 }
-
 export function ServicesSection() {
   return (
-    <section id="services" className="py-20 bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Заголовок */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Услуги и пакеты
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Комплексный видеомонтаж под ваши задачи — от идеи до готового ролика.
-          </p>
+    <section id="services" className="section-shell bg-[#eef1f5]">
+      <div className="site-container">
+        <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
+          <SectionHeading
+            eyebrow="Услуги"
+            title="От исходников до готового ролика"
+            description="Основное направление — видеомонтаж и постпродакшн. Точная стоимость зависит от продолжительности, исходных материалов и сложности задачи."
+          />
+          <button type="button" onClick={scrollToContact} className="primary-button focus-ring self-start lg:self-auto">
+            Рассчитать проект
+            <ArrowRight className="h-4 w-4" />
+          </button>
         </div>
 
-        {/* Карточки услуг */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {services.map((s, i) => {
-            const Icon = s.icon;
+        <StaggerGroup className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {services.map((service) => {
+            const Icon = service.icon;
             return (
-              <Card
-                key={i}
-                className={`relative transition-all duration-300 hover:shadow-xl ${
-                  s.popular ? "border-blue-500 shadow-lg" : "hover:scale-[1.02]"
+              <motion.article
+                key={service.title}
+                variants={revealVariants}
+                whileHover={{ y: -5 }}
+                transition={{ duration: 0.24 }}
+                className={`relative flex h-full flex-col rounded-2xl border bg-white p-6 shadow-soft ${
+                  service.popular ? "border-blue-300" : "border-slate-200"
                 }`}
               >
-                {s.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-blue-600 text-white px-3 py-1">
-                      Самое популярное
-                    </Badge>
-                  </div>
+                {service.popular && (
+                  <span className="absolute right-5 top-5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">
+                    Частый запрос
+                  </span>
                 )}
-
-                <CardHeader className="text-center pb-4">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Icon className="w-8 h-8 text-blue-600" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{s.title}</h3>
-                  <p className="text-gray-600">{s.description}</p>
-                </CardHeader>
-
-                <CardContent>
-                  <ul className="space-y-2 mb-6">
-                    {s.features.map((f, j) => (
-                      <li key={j} className="flex items-center text-sm text-gray-700">
-                        <Check className="w-4 h-4 text-blue-600 mr-2" />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="border-t pt-4">
-                    <div className="text-2xl font-bold text-gray-900 mb-4">{s.price}</div>
-                    <Button
-                      onClick={scrollToContact}
-                      className={`w-full ${
-                        s.popular
-                          ? "bg-blue-600 hover:bg-blue-700 text-white"
-                          : "bg-gray-900 hover:bg-gray-800 text-white"
-                      }`}
-                    >
-                      Заказать
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-slate-950 text-white">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className="max-w-[20ch] text-xl font-bold leading-tight text-slate-950">
+                  {service.title}
+                </h3>
+                <p className="mt-3 text-base leading-relaxed text-slate-600">{service.description}</p>
+                <ul className="mt-5 grid gap-2 text-sm text-slate-600">
+                  {service.features.map((feature) => (
+                    <li key={feature} className="flex items-center gap-2">
+                      <Check className="h-4 w-4 shrink-0 text-blue-600" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-auto flex items-center justify-between gap-4 border-t border-slate-200 pt-5">
+                  <strong className="text-lg text-slate-950">{service.price}</strong>
+                  <button type="button" onClick={scrollToContact} className="focus-ring rounded-lg text-sm font-bold text-blue-700 hover:text-blue-900">
+                    Заказать
+                  </button>
+                </div>
+              </motion.article>
             );
           })}
-        </div>
+        </StaggerGroup>
 
-        {/* Доп. услуги */}
-        <div className="bg-white rounded-xl p-8 shadow-lg">
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
-              Дополнительные услуги
-            </h3>
-            <p className="text-gray-600">
-              Усильте проект с помощью опциональных дополнений
-            </p>
+        <Reveal className="tech-panel relative mt-10 overflow-hidden rounded-2xl border border-white/10 bg-[#101827] p-6 text-white shadow-soft sm:p-8">
+          <div className="tech-network pointer-events-none absolute inset-0" aria-hidden="true" />
+          <div className="relative z-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-start">
+            <div className="max-w-xl">
+              <p className="section-kicker text-blue-300">Дополнительные возможности</p>
+              <h3 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                Современные инструменты — в поддержку основной задачи
+              </h3>
+              <p className="mt-3 text-base leading-relaxed text-slate-300">
+                Дополнительно работаю с генеративными инструментами и AI-прототипированием: создаю недостающий визуал, озвучку и концепции, а также могу собрать простой лендинг, сайт-портфолио или базового Telegram-бота. Эти возможности дополняют основную работу с видео и обсуждаются отдельно в зависимости от задачи.
+              </p>
+            </div>
+            <Sparkles className="hidden h-8 w-8 text-blue-300 lg:block" />
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {addOns.map((a, i) => (
-              <div
-                key={i}
-                className="text-center p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors"
-              >
-                <h4 className="font-semibold text-gray-900 mb-2">{a.name}</h4>
-                <p className="text-blue-600 font-bold">{a.price}</p>
-              </div>
+          <StaggerGroup className="relative z-10 mt-7 grid gap-x-8 gap-y-1 md:grid-cols-2">
+            {additionalCapabilities.map((item) => (
+              <StaggerItem key={item} className="flex items-start gap-3 border-t border-white/10 py-4 text-[15px] font-semibold leading-relaxed text-slate-200">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
+                {item}
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerGroup>
+        </Reveal>
 
-          <div className="text-center bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-8 text-white">
-            <h4 className="text-xl font-bold mb-2">Нужен индивидуальный проект?</h4>
-            <p className="mb-4 opacity-90">
-              Обсудим требования и соберём решение под ключ.
-            </p>
-            <Button
-              variant="secondary"
-              onClick={scrollToContact}
-              className="bg-white text-gray-900 hover:bg-gray-100"
-            >
-              Обсудить проект
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Процесс */}
-        <div className="mt-16 text-center">
-          <h3 className="text-2xl font-bold text-gray-900 mb-8">Как это работает</h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {[
-              { step: "1", title: "Заявка", desc: "Обсуждаем задачу и требования" },
-              { step: "2", title: "Согласование", desc: "Определяем сроки и уточняем детали" },
-              { step: "3", title: "Монтаж", desc: "Монтаж, цвет, звук, графика" },
-              { step: "4", title: "Отправка", desc: "Передаю готовый ролик" },
-            ].map((it) => (
-              <div key={it.step} className="relative">
-                <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-4">
-                  {it.step}
+        <div className="mt-10 grid gap-5 lg:grid-cols-[1fr_1.25fr]">
+          <Reveal className="rounded-2xl bg-[#111827] p-6 text-white sm:p-8">
+            <h3 className="text-2xl font-bold">Дополнительные услуги</h3>
+            <div className="mt-5 divide-y divide-white/10">
+              {addOns.map(([name, price]) => (
+                <div key={name} className="flex flex-col justify-between gap-1 py-3 text-sm sm:flex-row sm:gap-4">
+                  <span className="text-slate-300">{name}</span>
+                  <strong className="text-white">{price}</strong>
                 </div>
-                <h4 className="font-semibold text-gray-900 mb-2">{it.title}</h4>
-                <p className="text-gray-600 text-sm">{it.desc}</p>
-                {it.step !== "4" && (
-                  <div className="hidden md:block absolute top-6 left-1/2 w-full h-0.5 bg-gray-300 translate-x-6" />
-                )}
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </Reveal>
+
+          <Reveal className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+            <h3 className="text-2xl font-bold text-slate-950">Как проходит работа</h3>
+            <div className="mt-6 grid gap-5 sm:grid-cols-2">
+              {[
+                ["01", "Обсуждение задачи", "Обсуждаем цель, формат, референсы, объём работы и желаемый результат."],
+                ["02", "Материалы и согласование", "Вы отправляете исходники через облако, почту или мессенджер. После этого фиксируем сроки, стоимость и основные детали."],
+                ["03", "Монтаж и правки", "Собираю ролик, добавляю цвет, звук и графику, затем вношу согласованные изменения."],
+                ["04", "Передача", "Экспортирую финальные версии под нужные площадки и передаю готовые файлы."],
+              ].map(([step, title, description]) => (
+                <div key={step} className="border-t border-slate-200 pt-4">
+                  <span className="text-xs font-bold text-blue-700">{step}</span>
+                  <h4 className="mt-1 font-bold text-slate-950">{title}</h4>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600">{description}</p>
+                </div>
+              ))}
+            </div>
+          </Reveal>
         </div>
       </div>
     </section>
