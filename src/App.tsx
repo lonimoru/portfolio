@@ -3,6 +3,7 @@ import { useLayoutEffect } from "react";
 
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
+import { SeoMetadata } from "./components/SeoMetadata";
 
 import Home from "./pages/Home";
 import Projects from "./pages/Projects";
@@ -39,6 +40,7 @@ export default function App() {
       >
         Перейти к содержимому
       </a>
+      <SeoMetadata />
       <Navigation />
       <ScrollManager />
 
